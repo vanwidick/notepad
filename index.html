@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Untitled - Notepad</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#008080;font-family:"Segoe UI",Tahoma,sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:24px}
+.win{width:100%;max-width:900px;background:#fff;border:1px solid #7a7a7a;box-shadow:0 8px 30px rgba(0,0,0,.35);display:flex;flex-direction:column;height:calc(100vh - 48px)}
+.title{display:flex;align-items:center;height:32px;background:#fff;border-bottom:1px solid #e5e5e5;font-size:12px;padding-left:10px;user-select:none}
+.title .ico{width:16px;height:16px;margin-right:8px;background:linear-gradient(#cfe8ff,#7fb6ea);border:1px solid #4a7fb5;border-radius:2px}
+.title .name{flex:1}
+.title .b{width:46px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:default}
+.title .b:hover{background:#e5e5e5}.title .x:hover{background:#e81123;color:#fff}
+.menu{display:flex;font-size:12px;border-bottom:1px solid #e5e5e5;background:#fff;position:relative}
+.menu>div{padding:4px 9px;cursor:default;position:relative}
+.menu>div:hover{background:#e5f1fb}
+.dd{display:none;position:absolute;top:100%;left:0;background:#f2f2f2;border:1px solid #ccc;min-width:190px;z-index:5;box-shadow:2px 2px 6px rgba(0,0,0,.2)}
+.menu>div:hover .dd{display:block}
+.dd div{padding:5px 20px}.dd div:hover{background:#91c9f7}
+.dd span{float:right;color:#666}
+.body{flex:1;overflow:auto;font-family:Consolas,"Lucida Console","Courier New",monospace;font-size:15px;padding:10px 14px}
+.issue{border-bottom:1px dashed #bbb;padding-bottom:12px;margin-bottom:10px}
+.ih{font-weight:bold;margin-bottom:6px}
+.row{display:flex;align-items:flex-end;margin:6px 0}
+.row input{width:22ch;flex:none;font:inherit;border:none;border-bottom:1px solid #000;outline:none;padding:3px 2px;background:transparent}
+.row input:focus{border-bottom-color:#0078d7;background:#f7fbff}
+.lbl{white-space:pre}
+.grid{display:grid;grid-template-columns:150px 1fr;gap:6px 10px;align-items:center;border-bottom:1px dashed #bbb;padding-bottom:12px;margin-bottom:10px}
+.grid label{white-space:nowrap}
+.grid input{font:inherit;border:none;border-bottom:1px solid #ccc;outline:none;padding:3px 2px;background:transparent}
+.grid input:focus{border-bottom-color:#0078d7;background:#f7fbff}
+textarea{width:100%;min-height:340px;border:none;outline:none;resize:none;font:inherit;line-height:1.45}
+.status{display:flex;justify-content:flex-end;gap:0;font-size:12px;background:#f0f0f0;border-top:1px solid #ddd}
+.status div{padding:3px 14px;border-left:1px solid #ccc}
+.footer{text-align:center;padding:10px 6px 8px;background:#1b1b1b;color:#fff}
+.footer .brand{font-family:"Black Ops One",Impact,"Arial Black",sans-serif;font-size:22px;letter-spacing:4px}
+.footer .ver{font-size:11px;color:#bbb;letter-spacing:1px;margin-top:2px;font-family:Consolas,monospace}
+@media print{body{background:#fff;padding:0}.title,.menu,.status{display:none}.win{box-shadow:none;border:none;height:auto}}
+</style></head><body>
+<div class="win">
+ <div class="title"><div class="ico"></div><div class="name" id="tname">*Untitled - Notepad</div><div class="b">&#8212;</div><div class="b">&#9744;</div><div class="b x">&#10005;</div></div>
+ <div class="menu">
+  <div>File<div class="dd">
+   <div onclick="newNote()">New<span>Ctrl+N</span></div>
+   <div onclick="saveTxt()">Save as .txt<span>Ctrl+S</span></div>
+   <div onclick="window.print()">Print<span>Ctrl+P</span></div></div></div>
+  <div>Edit<div class="dd">
+   <div onclick="stamp()">Time/Date<span>F5</span></div>
+   <div onclick="clearFields()">Clear info fields</div></div></div>
+  <div>Format<div class="dd">
+   <div onclick="fs(1)">Bigger text</div><div onclick="fs(-1)">Smaller text</div></div></div>
+  <div>View</div><div>Help</div>
+ </div>
+ <div class="body" id="body">
+  <div class="issue" id="grid">
+   <div class="ih">Issue</div>
+   <div class="row"><input data-k="issue1"><span class="lbl" style="margin-left:10ch">Send link to</span></div>
+   <div class="row"><input data-k="issue2"><span class="lbl" style="margin-left:5ch">Retailer</span></div>
+   <div class="row"><input data-k="issue3"><span class="lbl" style="margin-left:10ch"></span></div>
+  </div>
+  <textarea id="notes" placeholder="Type your notes here..."></textarea>
+ </div>
+ <div class="status"><div id="saved">Saved</div><div id="pos">Ln 1, Col 1</div><div>100%</div><div>Windows (CRLF)</div><div>UTF-8</div></div>
+ <div class="footer"><div class="brand">DESIGN BY VAN</div><div class="ver">v1.1.0 &middot; Oct 3, 2026</div></div>
+</div>
+<script>
+const K='vanNotepad_v11',ins=[...document.querySelectorAll('[data-k]')],ta=document.getElementById('notes');
+let size=15;
+function load(){try{const d=JSON.parse(localStorage.getItem(K)||'{}');ins.forEach(i=>i.value=d[i.dataset.k]||'');ta.value=d.notes||'';if(d.size){size=d.size;applyFs()}}catch(e){}
+ }
+let t;function save(){document.getElementById('saved').textContent='Saving...';clearTimeout(t);t=setTimeout(()=>{const d={notes:ta.value,size};ins.forEach(i=>d[i.dataset.k]=i.value);localStorage.setItem(K,JSON.stringify(d));document.getElementById('saved').textContent='Saved';title()},300)}
+function title(){const s=ins[0].value.trim();document.getElementById('tname').textContent=(s||'Untitled')+' - Notepad';document.title=(s||'Untitled')+' - Notepad'}
+function pos(){const v=ta.value.substr(0,ta.selectionStart).split('\n');document.getElementById('pos').textContent='Ln '+v.length+', Col '+(v[v.length-1].length+1)}
+function newNote(){if(confirm('Start a new note? This clears the current one.')){ins.forEach(i=>i.value='');ta.value='';save()}}
+function clearFields(){ins.forEach(i=>i.value='');save()}
+function stamp(){const s=new Date().toLocaleString(),p=ta.selectionStart;ta.value=ta.value.slice(0,p)+s+ta.value.slice(ta.selectionEnd);ta.focus();ta.selectionStart=ta.selectionEnd=p+s.length;save()}
+function saveTxt(){let out='Issue\r\n';ins.forEach(i=>out+=i.value.padEnd(24)+(i.nextElementSibling?i.nextElementSibling.textContent:'')+'\r\n');out+='\r\n'+ta.value.replace(/\n/g,'\r\n');const s=ins[0].value.trim()||'Untitled';const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([out],{type:'text/plain'}));a.download=s+'.txt';a.click()}
+function applyFs(){document.getElementById('body').style.fontSize=size+'px'}
+function fs(n){size=Math.max(10,Math.min(28,size+n));applyFs();save()}
+ins.forEach(i=>i.addEventListener('input',save));ta.addEventListener('input',()=>{save();pos()});ta.addEventListener('click',pos);ta.addEventListener('keyup',pos);
+document.addEventListener('keydown',e=>{if(e.key==='F5'){e.preventDefault();stamp()}if(e.ctrlKey&&e.key==='s'){e.preventDefault();saveTxt()}});
+load();title();
+</script></body></html>
