@@ -19,6 +19,7 @@ body{background:#202020;font-family:"Segoe UI Variable","Segoe UI",system-ui,san
 .menu{display:flex;align-items:center;height:40px;background:#fff;font-size:14px;padding:0 6px;position:relative;border-bottom:1px solid #eee}
 .menu>div{padding:6px 12px;border-radius:5px;cursor:default;position:relative}
 .menu>div:hover{background:#f0f0f0}
+.clr{font:inherit;font-size:13px;background:#c42b1c;color:#fff;border:none;border-radius:5px;padding:6px 16px;margin-right:6px;cursor:pointer}.clr:hover{background:#a52517}
 .dd{display:none;position:absolute;top:100%;left:0;background:#fff;border:1px solid #ddd;border-radius:8px;min-width:200px;z-index:5;box-shadow:0 8px 16px rgba(0,0,0,.15);padding:4px}
 .menu>div:hover .dd{display:block}
 .dd div{padding:7px 14px;border-radius:4px}.dd div:hover{background:#f0f0f0}
@@ -40,9 +41,10 @@ textarea:focus,input:focus{background:#f6faff}
 <div class="win">
  <div class="tabs"><div class="appico"></div><div class="tab"><span id="tname">ISSUE</span><span class="dot" id="dot">&#9679;</span></div><div class="plus">+</div><div class="sp"></div><div class="wb">&#8212;</div><div class="wb">&#9744;</div><div class="wb x">&#10005;</div></div>
  <div class="menu">
-  <div>File<div class="dd"><div onclick="newNote()">New<span>Ctrl+N</span></div><div onclick="saveTxt()">Save as .txt<span>Ctrl+S</span></div><div onclick="window.print()">Print<span>Ctrl+P</span></div></div></div>
+  <div>File<div class="dd"><div onclick="clearAll()">New (clear all)<span>Ctrl+N</span></div><div onclick="saveTxt()">Save as .txt<span>Ctrl+S</span></div><div onclick="window.print()">Print<span>Ctrl+P</span></div></div></div>
   <div>Edit<div class="dd"><div onclick="stamp()">Time/Date<span>F5</span></div><div onclick="copyAll()">Copy all text</div></div></div>
   <div>View<div class="dd"><div onclick="fs(1)">Zoom in</div><div onclick="fs(-1)">Zoom out</div></div></div>
+ <div class="sp"></div><button class="clr" onclick="clearAll()">Clear</button>
  </div>
  <div class="body" id="body">
   <div class="sec"><p class="h">ISSUE</p><div class="rule">------------------------------</div>
@@ -59,10 +61,12 @@ Keep your account safe by never sharing these details unless you are the one who
    <div class="rule">-----------------------------</div><div class="rule">-----------------------------</div></div>
  </div>
  <div class="status"><div id="pos">Ln 1, Col 1</div><div id="chars">0 characters</div><div>Plain text</div><div class="grow"></div><div>100%</div><div>Windows (CRLF)</div><div>UTF-8</div></div>
- <div class="footer"><div class="brand">DESIGN BY VAN</div><div class="ver">v1.2.0 &middot; Oct 3, 2026</div></div>
+ <div class="footer"><div class="brand">DESIGN BY VAN</div><div class="ver">v1.3.0 &middot; Oct 3, 2026</div></div>
 </div>
 <script>
-const K='vanNotepad_v12',f=[...document.querySelectorAll('[data-k]')];let size=15,t;
+const K='vanNotepad_v12';const ORIG={},f=[...document.querySelectorAll('[data-k]')];let size=15,t;
+document.querySelectorAll('[data-k]').forEach(i=>ORIG[i.dataset.k]=i.value);
+function clearAll(){if(confirm('Clear all notes and reset to the original template?')){f.forEach(i=>i.value=ORIG[i.dataset.k]);localStorage.removeItem(K);count();f[0].focus()}}
 function load(){try{const d=JSON.parse(localStorage.getItem(K)||'null');if(d){f.forEach(i=>{if(d[i.dataset.k]!==undefined)i.value=d[i.dataset.k]});if(d.size){size=d.size;az()}}}catch(e){}count()}
 function save(){document.getElementById('dot').style.visibility='visible';clearTimeout(t);t=setTimeout(()=>{const d={size};f.forEach(i=>d[i.dataset.k]=i.value);localStorage.setItem(K,JSON.stringify(d));document.getElementById('dot').style.visibility='hidden'},400);count()}
 function count(){let n=0;f.forEach(i=>n+=i.value.length);document.getElementById('chars').textContent=n+' characters'}
